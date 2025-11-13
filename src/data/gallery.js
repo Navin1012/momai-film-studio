@@ -24,9 +24,9 @@ import gallery23 from "../assets/gallery/gallery23.jpg";
 import gallery24 from "../assets/gallery/gallery24.jpg";
 import gallery25 from "../assets/gallery/gallery25.jpg";
 import gallery26 from "../assets/gallery/gallery26.jpg";
-
+import gallery27 from "../assets/gallery/gallery27.jpg";
 export default [
-  { img: gallery1, name: "Elegant Wedding Portrait", category: "Wedding" },
+  { img: gallery1, name: "Elegant Wedding Portrait",  category: "Wedding" },
   { img: gallery2, name: "Romantic Pre-Wedding Shoot", category: "Pre-Wedding" },
   { img: gallery3, name: "Candid Wedding Moments", category: "Wedding" },
   { img: gallery4, name: "Engagement Celebration", category: "Engagement" },
@@ -52,5 +52,5 @@ export default [
   { img: gallery24, name: "Candid Wedding Moments", category: "Wedding" },
   { img: gallery25, name: "Engagement Celebration", category: "Engagement" },
   { img: gallery26, name: "Luxury Bridal Shoot", category: "Wedding" },
-  
+  { img: gallery27, name: "Luxury Bridal Shoot", category: "Wedding" },
 ];

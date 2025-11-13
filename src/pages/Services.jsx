@@ -1,116 +1,181 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useCallback } from "react";
 import services from "../data/services";
 import { Star, Heart, Camera, Users, Clock, Award } from "lucide-react";
 
 export default function Services() {
+  const [openId, setOpenId] = useState(null);
+
+  const toggleDetails = useCallback((id) => {
+    setOpenId((prev) => (prev === id ? null : id));
+  }, []);
+
+  // Smooth Scroll Fix (Works on ALL mobiles)
+  const smoothScrollTop = () => {
+    const start = window.scrollY;
+    const duration = 500;
+    const startTime = performance.now();
+
+    const easeOutExpo = (t) =>
+      t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+
+    const animate = (now) => {
+      const time = Math.min(1, (now - startTime) / duration);
+      const eased = easeOutExpo(time);
+
+      window.scrollTo(0, start * (1 - eased));
+
+      if (time < 1) requestAnimationFrame(animate);
+    };
+
+    requestAnimationFrame(animate);
+  };
+
   return (
     <div className="bg-[#0D0D0D] text-white overflow-hidden">
 
-      {/* ===== Hero Section (Combined with Intro) ===== */}
+      {/* ================= HERO ================= */}
       <section
-        className="relative min-h-[75vh] flex items-center justify-center bg-cover bg-center"
+        className="relative min-h-[75vh] flex items-center justify-center bg-cover bg-center pb-4"
         style={{ backgroundImage: "url('/images/services-hero.jpg')" }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-[#0D0D0D]/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-[#0D0D0D]" />
 
-        <div className="relative text-center px-6 sm:px-10 z-10 max-w-4xl mx-auto">
+        <div className="relative px-6 text-center max-w-4xl z-10">
           <motion.h1
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight text-white"
+            initial={{ opacity: 0.5, y: 1 }}
+            animate={{ opacity: 1.9, y: 0.5 }}
+            transition={{ duration: 1.9 }}
+            className="text-4xl sm:text-5xl md:text-6xl font-extrabold"
           >
             Capturing <span className="text-[#D4AF37]">Stories</span> That Last Forever
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 1 }}
-            className="mt-5 text-[#F5EDE3]/80 text-base sm:text-lg md:text-xl leading-relaxed"
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 1 }}
+            className="mt-5 text-[#F5EDE3]/80 text-lg"
           >
-            At <span className="text-[#D4AF37] font-semibold">StudioLens</span>, we don’t just take photographs —
-            we tell your story through timeless artistry. Every shoot is crafted
-            to preserve emotion, elegance, and beauty.
+            We don’t just take photographs — we capture emotions.
           </motion.p>
         </div>
+      </section>
 
+      {/* ================= SERVICES GRID ================= */}
+<section className="py-10 px-6 bg-[#0D0D0D]">
+  <div className="max-w-7xl mx-auto grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+
+    {services.map((s, i) => (
+      <motion.div
+        key={s.id}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.75, delay: i * 0.35, ease: "easeOut" }}
+        className="relative rounded-2xl border border-[#D4AF37]/20 bg-[#111]
+        shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
+        style={{ minHeight: "430px" }}
+      >
+
+        {/* IMAGE (fade-out on open) */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0.1, 0.25, 0.1] }}
-          transition={{ duration: 12, repeat: Infinity }}
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-[#D4AF37]/10 blur-[120px] rounded-full pointer-events-none"
-        />
-      </section>
+          animate={{ opacity: openId === s.id ? 0 : 1 }}
+          transition={{ duration: 0.25 }}
+          className="h-52 w-full overflow-hidden"
+        >
+          <img
+            src={s.image}
+            className="w-full h-full object-cover transition-transform duration-700
+            hover:scale-105"
+            alt={s.name}
+          />
+        </motion.div>
 
-      {/* ===== Services Grid ===== */}
-      <section className="pt-0 pb-14 px-6 sm:px-10 bg-gradient-to-b from-[#0D0D0D] via-[#111] to-[#0D0D0D] relative -mt-1">
-        <div className="max-w-7xl mx-auto grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((s, i) => (
-            <motion.div
-              key={s.id}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: i * 0.1 }}
-              viewport={{ once: true }}
-              className="group bg-[#111]/95 rounded-2xl overflow-hidden border border-[#D4AF37]/20 
-              shadow-[0_0_20px_rgba(212,175,55,0.1)] hover:shadow-[0_0_40px_rgba(212,175,55,0.3)]
-              transition-all duration-500 hover:-translate-y-2"
-            >
-              <div className="relative overflow-hidden">
-                <img
-                  src={s.image}
-                  alt={s.name}
-                  className="w-full h-56 object-cover transform transition-transform duration-[1200ms] group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-              </div>
-              <div className="p-6 text-center">
-                <h3 className="text-2xl font-bold text-[#D4AF37] mb-2">{s.name}</h3>
-                <p className="text-[#F5EDE3]/80 text-sm sm:text-base leading-relaxed mb-5">
-                  {s.description}
-                </p>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-6 py-2 border border-[#D4AF37] text-[#D4AF37] font-semibold rounded-full hover:bg-[#D4AF37] hover:text-black transition-all duration-300"
-                >
-                  Learn More
-                </motion.button>
-              </div>
-            </motion.div>
-          ))}
+        {/* BASIC CONTENT */}
+        <div className="p-6 text-center">
+          <h3 className="text-2xl font-bold text-[#D4AF37]">{s.name}</h3>
+
+          <p className="text-[#F5EDE3]/80 text-sm mt-2">{s.description}</p>
+
+          <button
+            onClick={() => toggleDetails(s.id)}
+            className="mt-5 px-6 py-2 border border-[#D4AF37] text-[#D4AF37]
+            rounded-full font-semibold hover:bg-[#D4AF37] hover:text-black
+            transition-all duration-300"
+          >
+            {openId === s.id ? "Hide Details" : "Learn More"}
+          </button>
         </div>
-      </section>
 
-      {/* ===== Why Choose Us ===== */}
-      <section className="py-14 bg-[#111]/80 border-t border-[#D4AF37]/10">
-        <div className="max-w-6xl mx-auto text-center px-6">
-          <h2 className="text-3xl sm:text-4xl font-bold text-[#D4AF37]">Why Choose Us?</h2>
-          <p className="text-[#F5EDE3]/80 mt-3 max-w-2xl mx-auto text-base sm:text-lg">
-            We go beyond photography — creating experiences that reflect authenticity, artistry, and passion.
-          </p>
+        {/* DETAILS OVERLAY – SUPER LIGHT & FAST */}
+        <AnimatePresence>
+          {openId === s.id && (
+            <motion.div
+              key="details"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.25 }}
+              className="absolute inset-0 bg-[#0D0D0D]/95 p-6
+              rounded-2xl border border-[#D4AF37]/30 overflow-y-auto"
+            >
+              <h3 className="text-2xl font-bold text-[#D4AF37] mb-3">{s.name}</h3>
+
+              <p className="text-[#F5EDE3]/80 text-sm mb-3">
+                {s.fullDescription}
+              </p>
+
+              <h4 className="text-[#D4AF37] font-semibold text-sm mb-2">
+                Included Features:
+              </h4>
+
+              <ul className="text-[#F5EDE3]/80 text-sm space-y-1 mb-5">
+                {s.features.map((f, idx) => (
+                  <li key={idx}>✔️ {f}</li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => toggleDetails(s.id)}
+                className="px-6 py-2 bg-[#D4AF37] text-black rounded-full font-semibold
+                hover:scale-105 transition-all duration-200"
+              >
+                Close
+              </button>
+
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+      </motion.div>
+    ))}
+
+  </div>
+</section>
+
+
+      {/* ================= REST CONTENT SAME (optimized spacing) ================= */}
+
+      {/* WHY CHOOSE US */}
+      <section className="py-12 bg-[#111]/80 border-t border-[#D4AF37]/10">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <h2 className="text-3xl font-bold text-[#D4AF37]">Why Choose Us?</h2>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-            {[
-              { icon: <Camera />, title: "Creative Vision", desc: "Every session is a creative exploration of light and story." },
-              { icon: <Users />, title: "Friendly Team", desc: "We make you comfortable and confident during every shoot." },
-              { icon: <Clock />, title: "Timely Delivery", desc: "Receive your beautifully edited photos right on time." },
-              { icon: <Award />, title: "Premium Equipment", desc: "We use industry-leading cameras and lighting systems." },
-              { icon: <Star />, title: "5-Star Rated", desc: "Clients love our precision, creativity, and passion." },
-              { icon: <Heart />, title: "Love for Stories", desc: "Every photo is guided by emotion and storytelling." },
-            ].map((f, i) => (
+            {[Camera, Users, Clock, Award, Star, Heart].map((Icon, i) => (
               <motion.div
-                key={f.title}
-                initial={{ opacity: 0, y: 30 }}
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 viewport={{ once: true }}
-                className="p-5 bg-[#1A1A1A]/70 border border-[#D4AF37]/20 rounded-xl hover:shadow-[0_0_25px_rgba(212,175,55,0.25)] transition-all duration-500"
+                className="p-5 bg-[#1A1A1A] border border-[#D4AF37]/20 rounded-xl 
+                hover:shadow-[0_0_25px_rgba(212,175,55,0.25)]"
               >
-                <div className="text-[#D4AF37] mb-2 flex justify-center">{f.icon}</div>
-                <h4 className="text-lg font-semibold text-[#D4AF37]">{f.title}</h4>
-                <p className="text-[#F5EDE3]/80 text-sm mt-1">{f.desc}</p>
+                <Icon className="text-[#D4AF37] mx-auto mb-2" />
+                <p className="text-[#F5EDE3]/80 text-sm">
+                  Premium quality & professional aesthetic.
+                </p>
               </motion.div>
             ))}
           </div>
@@ -227,6 +292,16 @@ export default function Services() {
           Book Your Session
         </a>
       </section>
+
+      {/* SCROLL TOP BUTTON (ULTRA SMOOTH) */}
+      <button
+        onClick={smoothScrollTop}
+        className="fixed bottom-8 right-8 w-12 h-12 bg-gradient-to-br from-[#D4AF37] to-[#F5EDE3] 
+        rounded-xl shadow-xl flex items-center justify-center text-black hover:scale-105 transition"
+      >
+        ↑
+      </button>
+
     </div>
   );
 }

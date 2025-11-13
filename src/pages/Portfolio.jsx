@@ -1,131 +1,185 @@
-import { useState } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import gallery from "../data/gallery";
 
 export default function Portfolio() {
   const [selected, setSelected] = useState(null);
   const [category, setCategory] = useState("All");
+  const [visibleImages, setVisibleImages] = useState({});
+  const observerRef = useRef(null);
 
   const categories = ["All", "Wedding", "Pre-Wedding", "Engagement"];
 
+  /* -----------------------------
+      FILTERED IMAGES
+  ----------------------------- */
   const filteredImages =
     category === "All"
       ? gallery
       : gallery.filter((item) => item.category === category);
 
-  return (
-    <section className="py-16 px-6 bg-[#0D0D0D]">
+  /* -----------------------------
+      INTERSECTION OBSERVER (Lazy)
+  ----------------------------- */
+  useEffect(() => {
+    if (!("IntersectionObserver" in window)) return;
 
-      {/* Section Heading */}
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const key = entry.target.dataset.src;
+            setVisibleImages((prev) => ({
+              ...prev,
+              [key]: true,
+            }));
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    observerRef.current = obs;
+
+    return () => obs.disconnect();
+  }, []);
+
+  /* -----------------------------
+     LIGHTBOX CLOSE
+  ----------------------------- */
+  const closeLightbox = useCallback(() => setSelected(null), []);
+
+  return (
+    <section className="py-14 px-6 bg-[#0D0D0D]">
+
+      {/* SECTION HEADING */}
       <motion.div
-        initial={{ opacity: 0, y: -30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="text-center mb-16 relative z-10"
+
+        className="text-center mb-14 mt-12"
       >
-        <motion.h2
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-          className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-4"
-        >
-          Our <span className="text-[#D4AF37] relative">
+        <h2 className="text-4xl sm:text-6xl md:text-7xl font-bold text-white">
+          Our{" "}
+          <span className="text-[#D4AF37] relative inline-block">
             Portfolio
-            <motion.span
-              initial={{ width: 0 }}
-              animate={{ width: "100%" }}
-              transition={{ delay: 0.8, duration: 0.8 }}
-              className="absolute bottom-0 left-0 h-1 bg-[#D4AF37]"
-            />
           </span>
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-          className="text-[#F5EDE3]/90 max-w-2xl mx-auto mt-6 text-xl leading-relaxed"
-        >
-          Discover our beautifully curated photography experiences that capture life's most precious moments
-        </motion.p>
+        </h2>
+
+        <p className="text-[#F5EDE3]/80 max-w-2xl mx-auto mt-4 text-lg sm:text-xl">
+          Discover beautifully crafted visuals that capture unforgettable moments.
+        </p>
       </motion.div>
 
-      {/* Category Filter */}
-      <div className="flex justify-center mb-12">
-        <div className="flex items-center bg-[#1A1A1A] border border-[#D4AF37]/40 rounded-full px-3 py-2 shadow-[0_0_25px_rgba(212,175,55,0.2)]">
-          {categories.map((cat) => (
-            <motion.button
-              whileTap={{ scale: 0.92 }}
-              key={cat}
-              onClick={() => setCategory(cat)}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${category === cat
-                ? "bg-[#D4AF37] text-black shadow-[0_0_20px_rgba(212,175,55,0.6)]"
-                : "text-[#D4AF37] hover:bg-[#D4AF37]/20"
-                }`}
-            >
-              {cat}
-            </motion.button>
-          ))}
+      {/* FILTERS */}
+      <div className="mb-12">
+
+        {/* MOBILE FILTER (Scrollable) */}
+        <div className="md:hidden px-2">
+          <div
+            className="
+      flex overflow-x-auto no-scrollbar gap-3 px-3 py-2 
+      bg-[#1A1A1A] border border-[#D4AF37]/40 rounded-full
+      shadow-[0_0_20px_rgba(212,175,55,0.2)]
+    "
+          >
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setCategory(cat)}
+                className={`
+          px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all
+          ${category === cat
+                    ? "bg-[#D4AF37] text-black shadow-[0_0_12px_rgba(212,175,55,0.6)]"
+                    : "text-[#D4AF37] bg-[#262626] hover:bg-[#D4AF37]/20"
+                  }
+        `}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+
+        {/* DESKTOP FILTER */}
+        <div className="hidden md:flex justify-center">
+          <div className="
+            flex gap-3 bg-[#1A1A1A] border border-[#D4AF37]/40 
+            rounded-full px-4 py-3 shadow-[0_0_20px_rgba(212,175,55,0.2)]
+          ">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setCategory(cat)}
+                className={`
+                  px-6 py-2 rounded-full font-medium text-sm transition-all
+                  ${category === cat
+                    ? "bg-[#D4AF37] text-black shadow-[0_0_15px_rgba(212,175,55,0.5)]"
+                    : "text-[#D4AF37] hover:bg-[#D4AF37]/20"
+                  }
+                `}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
+      {/* MASONRY GALLERY */}
+      <div className="max-w-7xl mx-auto columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
+        {filteredImages.map((img) => (
+          <div
+            key={img.img}
+            data-src={img.img}
+            ref={(el) => {
+              if (el && observerRef.current) {
+                observerRef.current.observe(el);
+              }
+            }}
+            className="relative cursor-pointer rounded-xl overflow-hidden"
+            onClick={() => setSelected(img.img)}
+          >
+            {/* Lazy + Blur Preview */}
+            <img
+              src={visibleImages[img.img] ? img.img : img.blur}
+              alt={img.name}
+              className={`
+                w-full rounded-xl transition-all duration-[900ms]
+                ${visibleImages[img.img]
+                  ? "blur-0 scale-100"
+                  : "blur-xl scale-105"
+                }
+              `}
+            />
 
-      {/* Masonry Gallery */}
-      <div className="max-w-7xl mx-auto columns-1 sm:columns-2 md:columns-3 gap-5 space-y-5">
-        <AnimatePresence>
-          {filteredImages.map((img, index) => (
-            <motion.div
-              key={index}
-              layout
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.5 }}
-              className="relative group cursor-pointer"
-              onClick={() => setSelected(img.img)}
-            >
-              <img
-                src={img.img}
-                alt={img.name}
-                className="w-full rounded-xl object-cover shadow-[0_0_25px_rgba(212,175,55,0.25)] 
-                group-hover:shadow-[0_0_45px_rgba(212,175,55,0.45)] transition-all duration-700 group-hover:scale-[1.05]"
-              />
-
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 flex items-end justify-start opacity-0 group-hover:opacity-100 
-transition-all duration-500 bg-gradient-to-t from-black/70 via-black/30 to-transparent rounded-xl">
-
-                <motion.p
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className="text-[#F5EDE3] text-base font-medium tracking-wide px-4 py-3"
-                >
-                  {img.name}
-                </motion.p>
-
+            {/* Overlay text */}
+            {visibleImages[img.img] && (
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100 transition duration-500 flex items-end">
+                <p className="text-[#F5EDE3] text-base px-4 py-3">{img.name}</p>
               </div>
-
-            </motion.div>
-          ))}
-        </AnimatePresence>
+            )}
+          </div>
+        ))}
       </div>
 
-      {/* Lightbox Preview */}
+      {/* LIGHTBOX */}
       <AnimatePresence>
         {selected && (
           <motion.div
-            className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 cursor-pointer"
-            onClick={() => setSelected(null)}
+            onClick={closeLightbox}
+            className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 cursor-pointer"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.img
               src={selected}
-              className="max-w-[90%] max-h-[90%] rounded-lg shadow-[0_0_50px_#D4AF37]"
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.85, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="max-w-[90%] max-h-[90%] rounded-xl shadow-[0_0_45px_rgba(212,175,55,0.5)]"
             />
           </motion.div>
         )}

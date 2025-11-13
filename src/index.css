@@ -31,3 +31,12 @@ html, body {
   scrollbar-width: thin;
   scrollbar-color: #D4AF37 #0D0D0D;
 }
+/* Hide mobile scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE & Edge */
+  scrollbar-width: none; /* Firefox */
+}

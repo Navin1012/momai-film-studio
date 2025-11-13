@@ -25,29 +25,30 @@ export default function Footer() {
   };
 
   const scrollToTop = () => {
-    // GPU-friendly scroll (no lag)
-    window.requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
+    const start = window.scrollY;
+    const duration = 600; // Smooth time
+    const startTime = performance.now();
+
+    // Smooth natural easing
+    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+    const animation = (now) => {
+      const time = now - startTime;
+      const progress = Math.min(time / duration, 1);
+      const eased = easeOutCubic(progress);
+
+      window.scrollTo(0, start * (1 - eased));
+
+      if (progress < 1) {
+        requestAnimationFrame(animation);
+      }
+    };
+
+    requestAnimationFrame(animation);
   };
 
+
   const year = new Date().getFullYear();
-
-  const quickLinks = [
-    { name: "Home", path: "/" },
-    { name: "Services", path: "/services" },
-    { name: "Portfolio", path: "/portfolio" },
-    { name: "About", path: "/about" },
-    { name: "Contact", path: "/contact" },
-  ];
-
-  const services = [
-    "Wedding Photography",
-    "Pre-Wedding Shoots",
-    "Engagement Sessions",
-    "Portrait Photography",
-    "Commercial Shoots",
-  ];
 
   const socialLinks = [
     { icon: <Instagram className="w-5 h-5" />, url: "#" },
@@ -58,20 +59,19 @@ export default function Footer() {
   return (
     <footer className="bg-[#0D0D0D] border-t border-[#D4AF37]/20 relative overflow-hidden">
 
-      {/* GOLD GLOWS */}
-      <div className="absolute top-0 left-0 w-72 h-72 bg-[#D4AF37]/10 blur-3xl opacity-30 -translate-x-1/3 -translate-y-1/3"></div>
-      <div className="absolute bottom-0 right-0 w-72 h-72 bg-[#D4AF37]/10 blur-3xl opacity-30 translate-x-1/3 translate-y-1/3"></div>
+      {/* LIGHT GOLD GLOW */}
+      <div className="absolute top-0 left-0 w-64 h-64 bg-[#D4AF37]/10 blur-3xl opacity-20 -translate-x-1/3 -translate-y-1/3"></div>
 
       <div className="max-w-7xl mx-auto px-6 py-16 relative z-10">
 
-        {/* GRID SECTIONS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-14">
+        {/* TOP GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
 
-          {/* BRAND */}
+          {/* BRAND + ABOUT */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-3">
               <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#F5EDE3] shadow-lg">
-                <Camera className="w-6 h-6 text-[#0D0D0D]" />
+                <Camera className="w-6 h-6 text-black" />
               </div>
               <div>
                 <h3 className="text-2xl font-bold text-white">StudioLens</h3>
@@ -80,10 +80,10 @@ export default function Footer() {
             </div>
 
             <p className="text-[#F5EDE3]/80 text-sm leading-relaxed">
-              Capturing life's most precious moments with artistry & heart.
+              Capturing timeless moments with artistry & emotion.
             </p>
 
-            <div className="space-y-2 pt-4 text-[#F5EDE3]/80 text-sm">
+            <div className="space-y-2 pt-3 text-[#F5EDE3]/80 text-sm">
               <div className="flex items-center gap-3">
                 <Phone className="text-[#D4AF37] w-4 h-4" /> +1 (555) 123-4567
               </div>
@@ -91,43 +91,25 @@ export default function Footer() {
                 <Mail className="text-[#D4AF37] w-4 h-4" /> hello@studiolens.com
               </div>
               <div className="flex items-center gap-3">
-                <MapPin className="text-[#D4AF37] w-4 h-4" /> 123 Photography Lane
+                <MapPin className="text-[#D4AF37] w-4 h-4" /> New York, USA
               </div>
             </div>
           </div>
 
-          {/* QUICK LINKS */}
-          <div className="hidden sm:block space-y-4">
+          {/* QUICK LINKS - Hidden on Mobile */}
+          <div className="hidden md:block space-y-4">
             <h4 className="text-lg text-white font-semibold">Quick Links</h4>
-            <ul className="space-y-3">
-              {quickLinks.map((l) => (
-                <li key={l.name}>
-                  <a
-                    href={l.path}
-                    className="text-[#F5EDE3]/70 hover:text-[#D4AF37] transition-colors"
-                  >
-                    {l.name}
-                  </a>
-                </li>
-              ))}
+            <ul className="space-y-3 text-[#F5EDE3]/70 text-sm">
+              <li><a href="/" className="hover:text-[#D4AF37]">Home</a></li>
+              <li><a href="/services" className="hover:text-[#D4AF37]">Services</a></li>
+              <li><a href="/portfolio" className="hover:text-[#D4AF37]">Portfolio</a></li>
+              <li><a href="/about" className="hover:text-[#D4AF37]">About</a></li>
+              <li><a href="/contact" className="hover:text-[#D4AF37]">Contact</a></li>
             </ul>
           </div>
 
-          {/* SERVICES */}
-          <div className="space-y-4">
-            <h4 className="text-lg text-white font-semibold">Our Services</h4>
-            <ul className="space-y-3">
-              {services.map((s) => (
-                <li key={s}>
-                  <span className="text-[#F5EDE3]/70 hover:text-[#D4AF37] transition-colors cursor-pointer">
-                    {s}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
 
-          {/* SUBSCRIBE + SOCIAL */}
+          {/* SUBSCRIBE */}
           <div className="space-y-4">
             <h4 className="text-lg text-white font-semibold">Stay Updated</h4>
 
@@ -142,14 +124,10 @@ export default function Footer() {
                   value={email}
                   required
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#D4AF37]/30 rounded-xl text-white placeholder-[#F5EDE3]/40 text-sm focus:border-[#D4AF37] outline-none"
+                  className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#D4AF37]/30 rounded-xl text-white placeholder-[#F5EDE3]/40 text-sm"
                   placeholder="Enter your email"
                 />
-
-                <button
-                  type="submit"
-                  className="w-full py-3 bg-[#D4AF37] text-[#0D0D0D] font-semibold rounded-xl hover:bg-[#e7ca60] transition"
-                >
+                <button className="w-full py-3 bg-[#D4AF37] text-black font-semibold rounded-xl hover:bg-[#e7ca60] transition">
                   Subscribe
                 </button>
               </form>
@@ -163,8 +141,7 @@ export default function Footer() {
                   <a
                     key={i}
                     href={s.url}
-                    className="w-10 h-10 bg-[#1A1A1A] border border-[#D4AF37]/30 rounded-xl 
-                    flex items-center justify-center text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#0D0D0D] transition-all"
+                    className="w-10 h-10 bg-[#1A1A1A] border border-[#D4AF37]/30 rounded-xl flex items-center justify-center text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#0D0D0D] transition"
                   >
                     {s.icon}
                   </a>
@@ -175,33 +152,55 @@ export default function Footer() {
         </div>
 
         {/* BOTTOM BAR */}
-        <div className="border-t border-[#D4AF37]/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-[#F5EDE3]/70">
+        <div className="
+  border-t border-[#D4AF37]/20 
+  pt-6 pb-6 
+  flex flex-col md:flex-row 
+  items-center 
+  justify-between 
+  text-center md:text-left 
+  gap-3 md:gap-4 
+  text-sm 
+  text-[#F5EDE3]/70
+">
 
-          <div className="flex items-center gap-1">
+          {/* LEFT SIDE */}
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-1">
             © {year} StudioLens — Made with
-            <Heart className="w-4 h-4 text-red-500 ml-1" />
+            <Heart className="w-4 h-4 text-red-500 mx-1" />
             <a
               href="https://navinchaudhary.netlify.app/"
               target="_blank"
-              className="text-[#D4AF37] ml-1 hover:underline"
+              className="text-[#D4AF37] hover:underline"
             >
               Navin Chaudhary
             </a>
           </div>
 
-          <div className="flex gap-4">
+          {/* RIGHT SIDE */}
+          <div className="flex flex-wrap justify-center md:justify-end gap-4 mt-2 md:mt-0">
             <a href="#" className="hover:text-[#D4AF37] transition">Privacy Policy</a>
             <a href="#" className="hover:text-[#D4AF37] transition">Terms</a>
           </div>
+
         </div>
+
       </div>
 
-      {/* SCROLL TO TOP BUTTON */}
+      {/* Scroll to Top Button */}
       <button
         onClick={scrollToTop}
-        className="fixed bottom-8 right-8 w-12 h-12 rounded-xl shadow-xl shadow-[#D4AF37]/30 
-        bg-gradient-to-br from-[#D4AF37] to-[#F5EDE3] flex items-center justify-center text-[#0D0D0D] 
-        hover:scale-105 transition-transform"
+        className="
+    fixed bottom-8 right-8 
+    w-12 h-12 rounded-xl 
+    shadow-xl shadow-[#D4AF37]/30
+    bg-gradient-to-br from-[#D4AF37] to-[#F5EDE3]
+    flex items-center justify-center 
+    text-[#0D0D0D]
+    hover:scale-110 active:scale-95
+    transition-transform duration-300 
+    z-50
+  "
       >
         <ArrowUp className="w-6 h-6" />
       </button>
