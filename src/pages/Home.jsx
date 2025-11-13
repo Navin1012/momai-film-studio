@@ -1,46 +1,24 @@
 import { Suspense, lazy, useState, useEffect } from "react";
 
-// Lazy load sections
-const HeroSection = lazy(() => import("../components/sections/HeroSection"));
 const ServicesSection = lazy(() => import("../components/sections/ServicesSection"));
 const PortfolioSection = lazy(() => import("../components/sections/PortfolioSection"));
 const AboutSection = lazy(() => import("../components/sections/AboutSection"));
 const ContactSection = lazy(() => import("../components/sections/ContactSection"));
 
-// Loader
+import HeroSection from "../components/sections/HeroSection";
+
 function Loader({ fading }) {
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center text-center space-y-6 
-      bg-[#0D0D0D] transition-opacity duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] 
+      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center
+      bg-[#0D0D0D] transition-opacity duration-500 
       ${fading ? "opacity-0 pointer-events-none" : "opacity-100"}`}
     >
-      {/* Golden Ring Loader */}
-      <div className="relative w-20 h-20 sm:w-24 sm:h-24">
+      <div className="relative w-20 h-20">
         <div className="absolute inset-0 rounded-full border-4 border-[#D4AF37]/25"></div>
-        <div className="absolute inset-0 rounded-full border-t-4 border-[#D4AF37] animate-spin-slow"></div>
-        <div className="absolute inset-0 rounded-full blur-2xl bg-[#D4AF37]/20"></div>
+        <div className="absolute inset-0 rounded-full border-t-4 border-[#D4AF37] animate-spin"></div>
       </div>
-
-      <p className="text-[#F5EDE3]/90 text-lg sm:text-xl font-medium tracking-wide relative overflow-hidden before:absolute before:inset-0 before:animate-[shine_1.8s_linear_infinite] before:bg-[linear-gradient(90deg,transparent,rgba(212,175,55,0.3),transparent)]">
-        Loading Awesomeness...
-      </p>
-
-      <style>
-        {`
-          @keyframes shine {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-          }
-          @keyframes spin-slow {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-          .animate-spin-slow {
-            animation: spin-slow 2.2s linear infinite;
-          }
-        `}
-      </style>
+      <p className="text-[#F5EDE3]/80 mt-4 text-lg">Preparing Awesomeness…</p>
     </div>
   );
 }
@@ -49,34 +27,63 @@ export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [fading, setFading] = useState(false);
 
+  const [showServices, setShowServices] = useState(false);
+  const [showPortfolio, setShowPortfolio] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const [showContact, setShowContact] = useState(false);
+
+  // ✅ Loader fade logic (black background protection)
   useEffect(() => {
+    document.body.style.backgroundColor = "#0D0D0D";
     document.body.style.overflow = "hidden";
 
-    // ⚡ FAST Loader Removal (500–600ms)
-    setTimeout(() => {
+    const timer1 = setTimeout(() => {
       setFading(true);
-      setTimeout(() => {
+
+      const timer2 = setTimeout(() => {
         setIsLoaded(true);
         document.body.style.overflow = "";
-      }, 400);
-    }, 150);
+        document.body.style.backgroundColor = "#0D0D0D";
+      }, 500);
 
-    // ⚡ Background Image Preloading (Non-blocking)
-    import("../data/services").then((m) => {
-      const services = m.default || [];
-      services.forEach((s) => {
-        const img = new Image();
-        img.src = s.image;
-      });
-    });
+      return () => clearTimeout(timer2);
+    }, 200);
 
-    import("../data/gallery").then((m) => {
-      const gallery = m.default || [];
-      gallery.forEach((g) => {
-        const img = new Image();
-        img.src = g.img;
-      });
-    });
+    return () => clearTimeout(timer1);
+  }, []);
+
+  // ✅ Improved Lazy Loading (smooth, preloading before visible)
+  useEffect(() => {
+    const options = {
+      root: null,
+      rootMargin: "300px", // 👈 preload ~300px before section is visible
+      threshold: 0.1,
+    };
+
+    const observeSection = (id, callback) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // 👇 Use requestIdleCallback for smoother performance if available
+            if ("requestIdleCallback" in window) {
+              requestIdleCallback(() => callback(true));
+            } else {
+              setTimeout(() => callback(true), 100);
+            }
+          }
+        });
+      }, options);
+
+      observer.observe(el);
+    };
+
+    observeSection("services-trigger", setShowServices);
+    observeSection("portfolio-trigger", setShowPortfolio);
+    observeSection("about-trigger", setShowAbout);
+    observeSection("contact-trigger", setShowContact);
   }, []);
 
   return (
@@ -84,29 +91,45 @@ export default function Home() {
       {/* Loader */}
       {!isLoaded && <Loader fading={fading} />}
 
-      {/* Main Content */}
-      <div
-        className={`relative z-10 bg-[#0D0D0D] text-white overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${
-          isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
-        }`}
-        style={{
-          willChange: "opacity, transform",
-          transform: "translate3d(0, 0, 0)",
-        }}
-      >
-        <Suspense fallback={null}>
-          <HeroSection />
-          <ServicesSection />
-          <PortfolioSection />
-          <AboutSection />
-          <ContactSection />
-        </Suspense>
-      </div>
+      {/* Black overlay to prevent white flash */}
+      {!isLoaded && <div className="fixed inset-0 z-[9998] bg-[#0D0D0D]" />}
 
-      {/* Dark Background behind loader */}
-      {!isLoaded && (
-        <div className="fixed inset-0 bg-[#0D0D0D] z-[9998] pointer-events-none" />
-      )}
+      <div
+        className={`relative z-10 bg-[#0D0D0D] text-white transition-opacity duration-700 ${
+          isLoaded ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <HeroSection />
+
+        {/* ↓↓↓ Section Triggers ↓↓↓ */}
+        <div id="services-trigger" className="h-6"></div>
+        {showServices && (
+          <Suspense fallback={<div className="min-h-[50vh] bg-[#0D0D0D]" />}>
+            <ServicesSection lazyImage />
+          </Suspense>
+        )}
+
+        <div id="portfolio-trigger" className="h-6"></div>
+        {showPortfolio && (
+          <Suspense fallback={<div className="min-h-[50vh] bg-[#0D0D0D]" />}>
+            <PortfolioSection lazyImage />
+          </Suspense>
+        )}
+
+        <div id="about-trigger" className="h-6"></div>
+        {showAbout && (
+          <Suspense fallback={<div className="min-h-[50vh] bg-[#0D0D0D]" />}>
+            <AboutSection lazyImage />
+          </Suspense>
+        )}
+
+        <div id="contact-trigger" className="h-6"></div>
+        {showContact && (
+          <Suspense fallback={<div className="min-h-[50vh] bg-[#0D0D0D]" />}>
+            <ContactSection lazyImage />
+          </Suspense>
+        )}
+      </div>
     </>
   );
 }

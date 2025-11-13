@@ -1,12 +1,11 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import gallery from "../../data/gallery";
 
 export default function PortfolioSection() {
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [loadedImages, setLoadedImages] = useState(new Set());
   const [isMobile, setIsMobile] = useState(false);
-  const loadedRef = useRef(new Set());
 
   // 📱 Detect mobile
   useEffect(() => {
@@ -16,68 +15,43 @@ export default function PortfolioSection() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // 🚀 Preload visible images (batch updates)
+  // 🚀 Parallel preload of visible images
   useEffect(() => {
     const visible = gallery.slice(0, 6);
-    let loadedCount = 0;
-
-    const loadImage = (src) =>
-      new Promise((resolve) => {
+    const promises = visible.map((item, i) => {
+      return new Promise((resolve) => {
         const img = new Image();
-        img.src = src;
+        img.src = item.img;
         img.decoding = "async";
         img.loading = "lazy";
-        img.onload = img.onerror = resolve;
+        img.onload = img.onerror = () => resolve(i);
       });
+    });
 
-    (async () => {
-      for (let i = 0; i < visible.length; i++) {
-        await loadImage(visible[i].img);
-        loadedRef.current.add(i);
-        loadedCount++;
-        if (loadedCount % 2 === 0 || loadedCount === visible.length) {
-          setIsLoaded(loadedCount === visible.length);
-        }
-      }
-    })();
+    Promise.all(promises).then((indexes) => {
+      setLoadedImages(new Set(indexes));
+    });
   }, [isMobile]);
 
-  // 🎬 Image reveal animation
-  const revealEffect = {
-    initial: { opacity: 0, scale: 1.08, y: 20, filter: "blur(10px)" },
-    animate: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      filter: "blur(0px)",
-      transition: {
-        duration: 1.4,
-        ease: [0.19, 1, 0.22, 1],
-      },
-    },
-  };
-
-  // 🎞 Card animation variant
+  // 🎨 SIMPLE FADE-IN ANIMATION (No sliding up)
   const cardVariants = {
-    hidden: { opacity: 0, y: 20, scale: 0.97 },
+    hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: { duration: 1.1, ease: [0.19, 1, 0.22, 1] },
+      transition: { duration: 0.8, ease: "easeOut" },
     },
   };
 
   return (
     <section className="py-16 sm:py-20 px-4 sm:px-6 bg-gradient-to-b from-[#0D0D0D] via-[#111] to-[#0D0D0D] relative overflow-hidden">
-      {/* === Background Glow === */}
+      {/* Background Glow */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.05),transparent_70%)] pointer-events-none" />
 
       {/* === Heading === */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, ease: [0.19, 1, 0.22, 1] }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 1 }}
         viewport={{ once: true }}
         className="text-center mb-10 sm:mb-14 relative z-10"
       >
@@ -95,14 +69,10 @@ export default function PortfolioSection() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
-        variants={{
-          visible: {
-            transition: { staggerChildren: 0.15, delayChildren: 0.3 },
-          },
-        }}
+        variants={{}} // ❗ No staggerChildren (no extra animation)
       >
         {gallery.slice(0, 6).map((img, index) => {
-          const loaded = loadedRef.current.has(index);
+          const loaded = loadedImages.has(index);
 
           return (
             <motion.div
@@ -112,53 +82,39 @@ export default function PortfolioSection() {
               shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_25px_rgba(212,175,55,0.35)]
               transition-all duration-500 transform-gpu"
             >
-              {/* 🦴 Placeholder */}
+              {/* 🦴 Placeholder skeleton */}
               {!loaded && (
-                <div className="w-full h-[250px] sm:h-[320px] md:h-[360px] bg-[#1b1b1b] flex items-center justify-center text-[#D4AF37]/50 text-sm select-none">
-                  <motion.div
-                    initial={{ opacity: 0.2 }}
-                    animate={{ opacity: [0.2, 0.5, 0.2] }}
-                    transition={{ duration: 2.5, repeat: Infinity }}
-                    className="w-3/4 h-3/4 bg-gradient-to-r from-[#222] via-[#2a2a2a] to-[#222] rounded-lg"
-                  />
+                <div className="w-full h-[250px] sm:h-[320px] md:h-[360px] bg-[#1b1b1b] flex items-center justify-center">
+                  <div className="w-3/4 h-3/4 bg-gradient-to-r from-[#222] via-[#2a2a2a] to-[#222] rounded-lg animate-pulse"></div>
                 </div>
               )}
 
-              {/* 🎞️ Actual Image with Show Effect */}
-              <motion.div
-                initial="initial"
-                animate={loaded ? "animate" : ""}
-                variants={revealEffect}
-                className="relative"
-              >
-                <motion.img
-                  src={img.img}
-                  alt={img.name}
-                  decoding="async"
-                  loading="lazy"
-                  fetchpriority="low"
-                  className={`w-full h-[250px] sm:h-[320px] md:h-[360px] object-cover transform-gpu transition-transform duration-[1400ms] group-hover:scale-[1.04] rounded-xl ${
-                    !loaded ? "opacity-0" : "opacity-100"
-                  }`}
-                />
+              {/* 🎞️ Actual Image */}
+              <img
+                src={img.img}
+                alt={img.name}
+                decoding="async"
+                loading="lazy"
+                fetchpriority="low"
+                className={`w-full h-[250px] sm:h-[320px] md:h-[360px] object-cover transform-gpu rounded-xl 
+                  transition-all duration-[1000ms] ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:scale-[1.04]
+                  ${loaded ? "opacity-100" : "opacity-0"}`}
+                style={{
+                  transitionProperty: "opacity, transform",
+                }}
+              />
 
-                {/* ✨ Golden Sweep Light Effect */}
-                {loaded && (
-                  <motion.div
-                    initial={{ x: "-120%", opacity: 0.4 }}
-                    animate={{
-                      x: ["-120%", "120%"],
-                      opacity: [0.4, 0.1, 0],
-                      transition: {
-                        duration: 1.8,
-                        ease: "easeInOut",
-                        delay: 0.2,
-                      },
-                    }}
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4AF37]/20 to-transparent"
-                  />
-                )}
-              </motion.div>
+              {/* ✨ Golden Effect */}
+              {loaded && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{
+                    opacity: [0.3, 0.1, 0],
+                    transition: { duration: 1.2 },
+                  }}
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4AF37]/20 to-transparent pointer-events-none"
+                />
+              )}
 
               {/* === Overlay Caption === */}
               {loaded && (
@@ -174,11 +130,11 @@ export default function PortfolioSection() {
       </motion.div>
 
       {/* === View More Button === */}
-      {isLoaded && (
+      {loadedImages.size >= 6 && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 1 }}
           viewport={{ once: true }}
           className="text-center mt-12"
         >

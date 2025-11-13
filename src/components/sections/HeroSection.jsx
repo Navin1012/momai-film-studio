@@ -141,7 +141,7 @@ export default function HeroSection() {
             className="absolute inset-0 w-full h-full object-cover brightness-[45%]"
             initial={{ opacity: 1 }}
             animate={{ opacity: fade ? 0 : 1 }}
-            transition={{ duration: 1, ease: "easeInOut" }}
+            transition={{ duration: 7.6, ease: "easeInOut" }}
           />
 
           {nextImage && (
@@ -151,7 +151,7 @@ export default function HeroSection() {
               className="absolute inset-0 w-full h-full object-cover brightness-[45%]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 1, ease: "easeInOut" }}
+              transition={{ duration: 7.6, ease: "easeInOut" }}
             />
           )}
 
@@ -162,7 +162,7 @@ export default function HeroSection() {
               key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: textFade ? 0 : 1, y: textFade ? 20 : 0 }}
-              transition={{ duration: 0.7, ease: "easeInOut" }}
+                transition={{ duration: 1.5, ease: "easeInOut" }}
             >
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-white">
                 {currentSlide.title.split(currentSlide.highlight)[0]}
@@ -191,13 +191,7 @@ export default function HeroSection() {
             </motion.div>
           </div>
 
-          <motion.div
-            key={index + "-bar"}
-            initial={{ width: 0 }}
-            animate={{ width: "100%" }}
-            transition={{ duration: 5, ease: "linear" }}
-            className="absolute bottom-0 left-0 h-[3px] bg-[#D4AF37]/80"
-          />
+        
         </>
       )}
     </section>
