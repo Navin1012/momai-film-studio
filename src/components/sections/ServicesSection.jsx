@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import services from "../../data/services";
-
+import { Link } from "react-router-dom";
 export default function ServicesSection() {
   const [loadedImages, setLoadedImages] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
@@ -148,18 +148,20 @@ export default function ServicesSection() {
                   </p>
                 </div>
 
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                  className="mt-5 sm:mt-6 inline-block self-center px-6 py-2 border border-[#D4AF37]
-                    text-[#D4AF37] font-semibold rounded-full tracking-wide
-                    hover:bg-[#D4AF37] hover:text-black
-                    transition-all duration-300 shadow-[0_0_10px_rgba(212,175,55,0.15)]
-                    hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]"
-                >
-                  Learn More
-                </motion.button>
+              <Link to="/services">
+  <motion.button
+    whileHover={{ scale: 1.03 }}
+    whileTap={{ scale: 0.97 }}
+    transition={{ type: "spring", stiffness: 200, damping: 20 }}
+    className="mt-5 sm:mt-6 inline-block self-center px-6 py-2 border border-[#D4AF37]
+      text-[#D4AF37] font-semibold rounded-full tracking-wide
+      hover:bg-[#D4AF37] hover:text-black
+      transition-all duration-300 shadow-[0_0_10px_rgba(212,175,55,0.15)]
+      hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]"
+  >
+    Learn More
+  </motion.button>
+</Link>
               </motion.div>
             </motion.div>
           );
