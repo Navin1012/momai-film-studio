@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-
+import logoImg from "../assets/logo/momai.png";
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [hasBackground, setHasBackground] = useState(false);
@@ -28,39 +28,39 @@ export default function Navbar() {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.7, ease: "easeOut" }}
-      className={`fixed w-full z-50 transition-all duration-700 ${
-        hidden ? "-top-24" : "top-0"
-      } ${hasBackground
-        ? "bg-[#0a0a0a]/90 backdrop-blur-xl shadow-[0_0_40px_rgba(212,175,55,0.15)] border-b border-[#D4AF37]/10"
-        : "bg-transparent"
-      }`}
+      className={`fixed w-full z-50 transition-all duration-700 ease-out ${hidden ? "-top-34" : "top-0"
+        } ${hasBackground
+          ? "bg-[#0a0a0a]/90 backdrop-blur-xl shadow-[0_0_40px_rgba(212,175,55,0.15)] border-b border-[#D4AF37]/10"
+          : "bg-transparent"
+        }`}
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between relative">
 
         {/* ---------- LOGO ---------- */}
-        <Link to="/" className="flex items-center gap-3 group">
-          <motion.div
-            whileHover={{ rotate: 6, scale: 1.08 }}
-            transition={{ type: "spring", stiffness: 250 }}
-            className="w-12 h-12 flex items-center justify-center rounded-xl 
-                       bg-gradient-to-br from-[#D4AF37] to-[#b5932f]
-                       shadow-[0_0_15px_rgba(212,175,55,0.3)] relative overflow-hidden"
-          >
-            <motion.div
-              animate={{ x: ["-120%", "200%"] }}
-              transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12"
+        <Link
+          to="/"
+          className="
+    flex items-center group 
+     mt-[0px] 
+     md:mt-[10px] 
+    ml-[30px]      /* mobile: thoda left */
+    md:ml-[50px]   /* desktop: aapka original left */
+  "
+        >
+          <div className="w-16 h-16 flex items-center justify-center">
+            <img
+              src={logoImg}
+              alt="Logo"
+              className="
+        w-full h-full object-contain
+        scale-300        /* mobile size */
+        md:scale-400     /* desktop size */
+      "
             />
-            <span className="font-bold text-lg text-black tracking-wider">SL</span>
-          </motion.div>
-
-          <div>
-            <h1 className="text-white text-xl font-bold tracking-tight group-hover:text-[#D4AF37] transition-all duration-300">
-              StudioLens
-            </h1>
-            <p className="text-xs text-[#F5EDE3]/70">Cinematic Photography</p>
           </div>
         </Link>
+
+
 
         {/* ---------- DESKTOP NAV ---------- */}
         <div className="hidden md:flex gap-10 items-center">
@@ -74,17 +74,16 @@ export default function Navbar() {
               <NavLink
                 to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
                 className={({ isActive }) =>
-                  `relative tracking-wide font-medium transition-all duration-300 ${
-                    isActive
-                      ? "text-[#D4AF37]"
-                      : "text-[#F5EDE3]/80 hover:text-[#D4AF37]"
+                  `relative tracking-wide font-medium transition-all duration-300 ease-out ${isActive
+                    ? "text-[#D4AF37]"
+                    : "text-[#F5EDE3]/80 hover:text-[#D4AF37]"
                   }`
                 }
               >
                 {item}
                 <motion.span
                   layoutId="underline"
-                  className="absolute left-0 -bottom-1 h-[2px] w-0 group-hover:w-full bg-[#D4AF37] rounded-full transition-all duration-300"
+                  className="absolute left-0 -bottom-1 h-[2px] w-0 group-hover:w-full bg-[#D4AF37] rounded-full transition-all duration-300 ease-out"
                 />
               </NavLink>
             </motion.div>

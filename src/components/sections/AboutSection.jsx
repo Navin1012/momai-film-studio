@@ -11,7 +11,7 @@ export default function AboutSection() {
 
       {/* === Main Container === */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center relative z-10">
-        
+
         {/* === Image Section === */}
         <motion.div
           initial={{ opacity: 0, x: -60 }}
@@ -43,13 +43,8 @@ export default function AboutSection() {
         </motion.div>
 
         {/* === Text Section === */}
-        <motion.div
-          initial={{ opacity: 0, x: 60 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1.1, ease: [0.19, 1, 0.22, 1] }}
-          viewport={{ once: true, amount: 0.4 }}
-          className="space-y-7 sm:space-y-8 text-center lg:text-left"
-        >
+        <div className="space-y-7 sm:space-y-8 text-center lg:text-left">
+
           {/* Title */}
           <div className="relative inline-block mb-3 sm:mb-4">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-white">
@@ -71,30 +66,23 @@ export default function AboutSection() {
 
             <p>
               With{" "}
-              <span className="text-[#D4AF37] font-bold">
-                5+ years of experience
-              </span>
-              , our team blends cinematic artistry and natural light to create
-              timeless, heartfelt memories.
+              <span className="text-[#D4AF37] font-bold">5+ years of experience</span>,
+              our team blends cinematic artistry and natural light to create timeless,
+              heartfelt memories.
             </p>
           </div>
 
           {/* Quote */}
-          <motion.div
-            initial={{ opacity: 0, y: 25 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.1, ease: [0.19, 1, 0.22, 1], delay: 0.2 }}
-            viewport={{ once: true }}
-            className="pt-2 sm:pt-4"
-          >
+          <div className="pt-2 sm:pt-4">
             <p className="text-[#D4AF37]/90 font-medium italic text-lg sm:text-xl">
               “We don’t just take pictures — we immortalize your story.”
             </p>
             <div className="mt-3 sm:mt-4 text-[#F5EDE3]/70 text-sm tracking-wide">
               — StudioLens Creative Team
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
+
       </div>
 
       {/* === Subtle Floating Glow for Depth === */}

@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import services from "../../data/services";
 import { Link } from "react-router-dom";
+import logoImg from "../../assets/logo/momai.png";
+
 export default function ServicesSection() {
   const [loadedImages, setLoadedImages] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
@@ -86,46 +88,56 @@ export default function ServicesSection() {
             >
               {/* === Image Section === */}
               <div className="relative overflow-hidden h-56 sm:h-72 md:h-80">
+
+                {/* 🔥 Blink Logo Loader (Image Loading Placeholder) */}
                 {!isLoaded && (
-                  <div className="absolute inset-0 bg-[#1a1a1a] before:absolute before:inset-0 before:animate-[shimmer_2s_infinite] before:bg-[linear-gradient(110deg,transparent,rgba(212,175,55,0.15),transparent)]" />
+                  <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/10 backdrop-blur-[1px]">
+                    <motion.img
+                      src={logoImg}
+                      alt="Loading Logo"
+                      initial={{ opacity: 0.3, scale: 0.9 }}
+                      animate={{
+                        opacity: [0.3, 1, 0.3],
+                        scale: [0.9, 1, 0.9],
+                      }}
+                      transition={{
+                        duration: 1.3,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                      className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(212,175,55,0.45)]"
+                    />
+                  </div>
                 )}
 
-                {/* Actual Image — smooth fade + blur animation */}
+                {/* 🔥 Actual Image (shows only after load) */}
                 <motion.img
                   src={service.image}
                   alt={service.name}
                   onLoad={() => handleImageLoad(i)}
-                  initial={{ opacity: 0, scale: 1.05, filter: "blur(8px)" }}
+                  initial={{ opacity: 0, scale: 1.05, filter: "blur(10px)" }}
                   animate={
                     isLoaded
                       ? {
-                          opacity: [0, 0.8, 1],
-                          scale: [1.05, 1.02, 1],
-                          filter: ["blur(8px)", "blur(3px)", "blur(0px)"],
-                          transition: {
-                            duration: 1.6,
-                            ease: [0.16, 1, 0.3, 1],
-                            delay: 0.1,
-                          },
-                        }
+                        opacity: 1,
+                        scale: 1,
+                        filter: "blur(0px)",
+                        transition: {
+                          duration: 1.3,
+                          ease: [0.19, 1, 0.22, 1],
+                        },
+                      }
                       : {}
                   }
-                  className={`w-full h-full object-cover transform-gpu transition-transform duration-[1400ms] group-hover:scale-[1.05] ${
-                    !isLoaded ? "opacity-0" : "opacity-100"
-                  }`}
+                  className={`w-full h-full object-cover transition-all duration-700 ${!isLoaded ? "opacity-0" : "opacity-100"
+                    }`}
                 />
 
-                {/* Overlay Gradient + Shine */}
+                {/* Shine & overlay for hover */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4AF37]/25 to-transparent translate-x-[-100%] group-hover:animate-shine"></div>
-                </div>
 
-                {/* Label */}
-                <div className="absolute bottom-3 left-4 text-[#D4AF37]/80 text-sm uppercase tracking-widest">
-                  {i + 1 < 10 ? `0${i + 1}` : i + 1}
-                </div>
               </div>
+
 
               {/* === Text Section === */}
               <motion.div
@@ -148,20 +160,20 @@ export default function ServicesSection() {
                   </p>
                 </div>
 
-              <Link to="/services">
-  <motion.button
-    whileHover={{ scale: 1.03 }}
-    whileTap={{ scale: 0.97 }}
-    transition={{ type: "spring", stiffness: 200, damping: 20 }}
-    className="mt-5 sm:mt-6 inline-block self-center px-6 py-2 border border-[#D4AF37]
+                <Link to="/services">
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                    className="mt-5 sm:mt-6 inline-block self-center px-6 py-2 border border-[#D4AF37]
       text-[#D4AF37] font-semibold rounded-full tracking-wide
       hover:bg-[#D4AF37] hover:text-black
       transition-all duration-300 shadow-[0_0_10px_rgba(212,175,55,0.15)]
       hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]"
-  >
-    Learn More
-  </motion.button>
-</Link>
+                  >
+                    Learn More
+                  </motion.button>
+                </Link>
               </motion.div>
             </motion.div>
           );
