@@ -105,7 +105,7 @@ export default function ServicesSection() {
                         repeat: Infinity,
                         ease: "easeInOut",
                       }}
-                      className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(212,175,55,0.45)]"
+                      className="w-50 h-50 object-contain drop-shadow-[0_0_15px_rgba(212,175,55,0.45)]"
                     />
                   </div>
                 )}
