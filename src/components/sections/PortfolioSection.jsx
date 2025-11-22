@@ -86,7 +86,7 @@ export default function PortfolioSection() {
                         duration: 1.1,
                         repeat: Infinity,
                       }}
-                      className="w-20 h-20 object-contain drop-shadow-[0_0_20px_rgba(212,175,55,0.45)]"
+                      className="w-50 h-50 object-contain drop-shadow-[0_0_20px_rgba(212,175,55,0.45)]"
                     />
                   </div>
                 )}
